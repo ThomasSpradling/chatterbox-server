@@ -91,4 +91,36 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
+  it('Should send back an array with correct length', function () {
+    const data = {
+      username: 'steve',
+      text: 'random'
+    }
+    let req = new stubs.request('/classes/messages', 'POST', data);
+    let res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(201);
+
+    req = new stubs.request('/classes/messages', 'GET');
+    res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    const messages = JSON.parse(res._data);
+
+    expect(res._responseCode).to.equal(200);
+    expect(messages.length).to.equal(3);
+  });
+
+  it('Should respond with 403 if at root directory', function () {
+    var req = new stubs.request('/', 'GET');
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(403);
+    expect(res._ended).to.equal(true);
+  });
 });
